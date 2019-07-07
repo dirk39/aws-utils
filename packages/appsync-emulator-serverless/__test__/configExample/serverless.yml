@@ -13,9 +13,19 @@ custom:
     mappingTemplates:
       - ${file(./test-mapping-a.yml)}
       - ${file(./test-mapping-b.yml)}
+      - ${file(./test-mapping-pipeline.yml)}
     dataSources:
       - ${file(./test-data-source-a.yml)}
       - ${file(./test-data-source-b.yml)}
+    functionConfigurations:
+      - dataSource: graphqlLambda
+        name: 'authorizeFunction'
+        request: 'authorize-request.txt'
+        response: 'common-response.txt'
+      - dataSource: dataTable
+        name: 'fetchDataFunction'
+        request: 'fetchData.txt'
+        response: 'common-response.txt'
 
 resources:
  Resources:

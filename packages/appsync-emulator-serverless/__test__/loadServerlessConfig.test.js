@@ -22,6 +22,20 @@ describe('loadServerlessConfig', () => {
         assetPutRequestsTable: 'file-service-AssetPutRequests-dev',
         assetsTable: 'file-service-Assets-dev',
         appSync: {
+          functionConfigurations: [
+            {
+              dataSource: 'graphqlLambda',
+              name: 'authorizeFunction',
+              request: 'authorize-request.txt',
+              response: 'common-response.txt',
+            },
+            {
+              dataSource: 'dataTable',
+              name: 'fetchDataFunction',
+              request: 'fetchData.txt',
+              response: 'common-response.txt',
+            },
+          ],
           mappingTemplates: [
             {
               dataSource: 'QuoteRequest',
@@ -50,6 +64,14 @@ describe('loadServerlessConfig', () => {
               field: 'batchPutQuotes',
               request: 'batchput-request.txt',
               response: 'batchput-response.txt',
+            },
+            {
+              field: 'testPipelineQuery',
+              functions: ['authorizeFunction', 'fetchDataFunction'],
+              kind: 'PIPELINE',
+              request: 'before.txt',
+              response: 'after.txt',
+              type: 'Query',
             },
           ],
           dataSources: [
