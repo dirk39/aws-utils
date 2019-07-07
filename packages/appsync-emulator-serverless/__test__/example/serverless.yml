@@ -223,6 +223,23 @@ custom:
         type: Query
         request: lambda-with_stash-request.vtl
         response: result-with-stash-response.vtl
+      - type: Query
+        field: getPipelinePlayground
+        request: 'before.txt' # "before" template mapping 
+        response: 'after.txt' # "after" template mapping
+        kind: PIPELINE
+        functions:
+          - firstFunction
+          - secondFunction
+    functionConfigurations:
+      - dataSource: SubscriberPassthrough
+        name: 'firstFunction'
+        request: 'first-function-request.txt'
+        response: 'first-function-response.txt'
+      - dataSource: SubscriberPassthrough
+        name: 'secondFunction'
+        request: 'second-function-request.txt'
+        response: 'second-function-response.txt'
     serviceRole: 'AppSyncServiceRole'
     dataSources:
       - type: AMAZON_DYNAMODB

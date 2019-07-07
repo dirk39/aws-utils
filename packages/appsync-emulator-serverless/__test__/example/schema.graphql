@@ -29,6 +29,14 @@ type Query {
   urlTest(urlTest: String): AWSURL
   search(text: String!): [ESSearchResult]
   stashTest(name: String!): LambdaInfo!
+  getPipelinePlayground: PipelinePlayground!
+}
+
+type PipelinePlayground {
+  beforeTemplateMessage: String!
+  firstFunctionMessage: String!
+  secondFunctionMessage: String!
+  afterTemplateMessage: String!
 }
 
 type httpUser {
