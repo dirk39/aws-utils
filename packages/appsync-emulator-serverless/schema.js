@@ -272,6 +272,22 @@ const generateTypeResolver = (
   }
 };
 
+const generatePipelineResolver = ({
+  before, 
+  after, 
+  functions, 
+  functionConfigurations
+}) => async(root, vars, context, info) => {
+  const fieldPath = `${info.parentType}.${info.fieldName}`;
+    const pathInfo = gqlPathAsArray(info.path);
+    consola.start(`Resolve: ${fieldPath} [${pathInfo}]`);
+    log.info('resolving', pathInfo);
+
+    assert(context && context.jwt, 'must have context.jwt');
+    const resolverArgs = { root, vars, context, info };
+    const [request, stash] = runRequestVTL(before, resolverArgs);
+}
+
 const generateSubscriptionTypeResolver = (
   field,
   source,
@@ -342,21 +358,29 @@ const generateResolvers = (cwd, config, configs) => {
   );
 
   return config.mappingTemplates.reduce(
-    (sum, { dataSource, type, field, request, response }) => {
+    (sum, { dataSource, type, field, request, response, kind, functions }) => {
       if (!sum[type]) {
         // eslint-disable-next-line
         sum[type] = {};
       }
-      const source = dataSourceByName[dataSource];
-      const pathing = {
-        requestPath: path.join(mappingTemplates, request),
-        dataLoaderResolver: generateDataLoaderResolver(source, configs),
-        responsePath: path.join(mappingTemplates, response),
-      };
-      const resolver =
-        type === 'Subscription'
-          ? generateSubscriptionTypeResolver(field, source, configs, pathing)
-          : generateTypeResolver(source, configs, pathing);
+
+      let resolver = {};
+
+      if (typeof kind === 'undefined' || kind.toLowerCase() !== 'pipeline') {
+        
+        const source = dataSourceByName[dataSource];
+        const pathing = {
+          requestPath: path.join(mappingTemplates, request),
+          dataLoaderResolver: generateDataLoaderResolver(source, configs),
+          responsePath: path.join(mappingTemplates, response),
+        };
+        resolver =
+          type === 'Subscription'
+            ? generateSubscriptionTypeResolver(field, source, configs, pathing)
+            : generateTypeResolver(source, configs, pathing);
+      } else {
+        resolver = generatePipelineResolver({before: request, after: response, functions, functionConfigurations: config.functionConfigurations});
+      }
 
       return {
         ...sum,
