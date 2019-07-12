@@ -272,21 +272,21 @@ const generateTypeResolver = (
   }
 };
 
-const generatePipelineResolver = ({
-  before, 
-  after, 
-  functions, 
-  functionConfigurations
-}) => async(root, vars, context, info) => {
-  const fieldPath = `${info.parentType}.${info.fieldName}`;
-    const pathInfo = gqlPathAsArray(info.path);
-    consola.start(`Resolve: ${fieldPath} [${pathInfo}]`);
-    log.info('resolving', pathInfo);
+// const generatePipelineResolver = ({
+//   before,
+//   after,
+//   functions,
+//   functionConfigurations
+// }) => async(root, vars, context, info) => {
+//   const fieldPath = `${info.parentType}.${info.fieldName}`;
+//     const pathInfo = gqlPathAsArray(info.path);
+//     consola.start(`Resolve: ${fieldPath} [${pathInfo}]`);
+//     log.info('resolving', pathInfo);
 
-    assert(context && context.jwt, 'must have context.jwt');
-    const resolverArgs = { root, vars, context, info };
-    const [request, stash] = runRequestVTL(before, resolverArgs);
-}
+//     assert(context && context.jwt, 'must have context.jwt');
+//     const resolverArgs = { root, vars, context, info };
+//     const [request, stash] = runRequestVTL(before, resolverArgs);
+// }
 
 const generateSubscriptionTypeResolver = (
   field,
@@ -346,6 +346,24 @@ const generateSubscriptionTypeResolver = (
   };
 };
 
+const generatePathing = (
+  dataSource,
+  mappingTemplates,
+  request,
+  response,
+  configs,
+) => ({
+  requestPath: path.join(mappingTemplates, request),
+  dataLoaderResolver: generateDataLoaderResolver(dataSource, configs),
+  responsePath: path.join(mappingTemplates, response),
+});
+
+// const generateFunctionConfigurations = (dataSources, { functionConfigurations: [] }) => {
+//   for(let i = 0; i < functionConfigurations.length; ++i) {
+
+//   }
+// }
+
 const generateResolvers = (cwd, config, configs) => {
   const { mappingTemplatesLocation = 'mapping-templates' } = config;
   const mappingTemplates = path.join(cwd, mappingTemplatesLocation);
@@ -356,9 +374,10 @@ const generateResolvers = (cwd, config, configs) => {
     }),
     {},
   );
+  // const functionConfigurations = generateFunctionConfigurations(dataSourceByName, config);
 
   return config.mappingTemplates.reduce(
-    (sum, { dataSource, type, field, request, response, kind, functions }) => {
+    (sum, { dataSource, type, field, request, response, kind }) => {
       if (!sum[type]) {
         // eslint-disable-next-line
         sum[type] = {};
@@ -367,19 +386,19 @@ const generateResolvers = (cwd, config, configs) => {
       let resolver = {};
 
       if (typeof kind === 'undefined' || kind.toLowerCase() !== 'pipeline') {
-        
         const source = dataSourceByName[dataSource];
-        const pathing = {
-          requestPath: path.join(mappingTemplates, request),
-          dataLoaderResolver: generateDataLoaderResolver(source, configs),
-          responsePath: path.join(mappingTemplates, response),
-        };
+        const pathing = generatePathing(
+          source,
+          mappingTemplates,
+          request,
+          response,
+          configs,
+        );
+
         resolver =
           type === 'Subscription'
             ? generateSubscriptionTypeResolver(field, source, configs, pathing)
             : generateTypeResolver(source, configs, pathing);
-      } else {
-        resolver = generatePipelineResolver({before: request, after: response, functions, functionConfigurations: config.functionConfigurations});
       }
 
       return {
