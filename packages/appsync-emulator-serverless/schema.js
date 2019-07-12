@@ -358,11 +358,18 @@ const generatePathing = (
   responsePath: path.join(mappingTemplates, response),
 });
 
-// const generateFunctionConfigurations = (dataSources, { functionConfigurations: [] }) => {
-//   for(let i = 0; i < functionConfigurations.length; ++i) {
+const generateFunctionConfigurations = (
+  dataSources,
+  { functionConfigurations },
+) => {
+  const preparedFunctions = [];
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < functionConfigurations.length; ++i) {
+      console.log(functionConfigurations[i]);
+  }
 
-//   }
-// }
+  return preparedFunctions;
+};
 
 const generateResolvers = (cwd, config, configs) => {
   const { mappingTemplatesLocation = 'mapping-templates' } = config;
@@ -374,7 +381,8 @@ const generateResolvers = (cwd, config, configs) => {
     }),
     {},
   );
-  // const functionConfigurations = generateFunctionConfigurations(dataSourceByName, config);
+
+  const functionConfigurations = generateFunctionConfigurations(dataSourceByName, config);
 
   return config.mappingTemplates.reduce(
     (sum, { dataSource, type, field, request, response, kind }) => {
