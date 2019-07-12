@@ -374,6 +374,32 @@ describe('creates executable schema', () => {
     expect(result).toMatchObject({ data: { lambdaGo: { test: 'yup' } } });
   });
 
+  it('should return result build from a pipeline', async () => {
+    const output = await graphql({
+      schema,
+      contextValue,
+      source: `
+        query {
+          getPipelinePlayground {
+            beforeTemplateMessage
+            firstFunctionMessage
+            secondFunctionMessage
+            afterTemplateMessage
+          }
+        }
+      `,
+    });
+    // we can assert the same thing as we always use the same user.
+    expect(output).toMatchObject({
+      data: {
+        beforeTemplateMessage: 'this message come from before template',
+        firstFunctionMessage: 'this message come from first function',
+        secondFunctionMessage: 'this message come from second function',
+        afterTemplateMessage: 'After template message',
+      },
+    });
+  });
+
   it('should have identity with jwt contextValue', async () => {
     const output = await graphql({
       schema,
