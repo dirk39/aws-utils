@@ -12,6 +12,7 @@ before_install:
   - docker-compose run wait
   - npm install -g aws-sam-local
   - sudo apt-get install golang
+  - go version
   - go get -u github.com/aws/aws-lambda-go/lambda
   - bash compileAll.sh
 
