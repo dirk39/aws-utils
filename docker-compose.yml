@@ -13,3 +13,12 @@ services:
       - "61024:4572"
       # The UI
       - "61025:8080"
+  node:
+    build:
+      context: ./
+    image: aws-utils-test-image
+    volumes:
+      - ./:/home/node
+    depends_on: 
+      - localstack
+    tty: true
