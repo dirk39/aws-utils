@@ -18,7 +18,7 @@ services:
       context: ./
     image: aws-utils-test-image
     volumes:
-      - ./:/home/node
+      - ./:/app
     depends_on: 
       - localstack
     tty: true

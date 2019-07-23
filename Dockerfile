@@ -29,8 +29,6 @@ ENV NPM_CONFIG_PREFIX ~/.npm-global
 
 RUN chmod 777 -R /home/node 
 
-USER node
-
 #install global dependecies
 RUN npm install -g go-npm
 
@@ -38,4 +36,4 @@ RUN npm install -g aws-sam-local --ignore-scripts
 
 RUN npm install -g yarn
 
-WORKDIR /home/node
+WORKDIR /app
